@@ -1,21 +1,11 @@
 import React from "react";
-import { api } from "../utils/Api.js";
+import { useContext } from "react";
 import Card from "./Card.js";
+import { CurrentUserContext } from "../contexts/CurrentUserContext.js";
 
 function Main(props) {
-  const [userData, setUserData] = React.useState({});
-  const [cards, setCards] = React.useState([]);
 
-  React.useEffect(() => {
-    Promise.all([api.getUserInfo(), api.getCards()])
-      .then(([userData, userCards]) => {
-        setUserData(userData);
-        setCards(userCards);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }, []);
+  const currentUser = useContext(CurrentUserContext);
 
   return (
     <>
@@ -25,7 +15,7 @@ function Main(props) {
             <div className="profile__foto-block">
               <img
                 className="profile__foto"
-                src={userData.avatar}
+                src={currentUser.avatar}
                 alt="Аватар"
               />
               <button
@@ -35,13 +25,13 @@ function Main(props) {
               ></button>
             </div>
             <div className="profile__info">
-              <h1 className="profile__name">{userData.name}</h1>
+              <h1 className="profile__name">{currentUser.name}</h1>
               <button
                 className="profile__edit-button"
                 type="button"
                 onClick={props.onEditProfile}
               ></button>
-              <p className="profile__description">{userData.about}</p>
+              <p className="profile__description">{currentUser.about}</p>
             </div>
           </div>
           <button
@@ -51,7 +41,7 @@ function Main(props) {
           ></button>
         </section>
         <section className="elements" aria-label="Элементы">
-          {cards.map((card) => (
+          {props.cards.map((card) => (
             <Card
               key={card._id}
               card={card}
@@ -59,6 +49,8 @@ function Main(props) {
               name={card.name}
               likes={card.likes}
               onCardClick={props.onCardClick}
+              onCardLike={props.handleCardLike}
+              onCardDelete={props.handleCardDelete}
             />
           ))}
         </section>
